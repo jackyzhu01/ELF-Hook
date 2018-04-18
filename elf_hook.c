@@ -290,9 +290,11 @@ static int symbol_by_name(int d, Elf_Shdr *section, char const *name, Elf_Sym **
     char const *strings = NULL;
     Elf_Sym *symbols = NULL;
     size_t i, amount;
+    int found;
 
     *symbol = NULL;
     *index = 0;
+    found = 0;
 
     if (
         section_by_index(d, section->sh_link, &strings_section) ||
@@ -319,6 +321,7 @@ static int symbol_by_name(int d, Elf_Shdr *section, char const *name, Elf_Sym **
 
             memcpy(*symbol, symbols + i, sizeof(Elf_Sym));
             *index = i;
+            found = 1;
 
             break;
         }
@@ -327,7 +330,7 @@ static int symbol_by_name(int d, Elf_Shdr *section, char const *name, Elf_Sym **
     free((void *)strings);
     free(symbols);
 
-    return 0;
+    return !found;
 }
 //--------------------------------------------------------------------------------------------------
 int get_module_base_address(char const *module_filename, void *handle, void **base)
